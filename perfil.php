@@ -197,9 +197,7 @@ $imagem = $row['imagem'];
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="p-4 border shadow-lg rounded mt-4">
-                <div class="text-center mb-4">
-                    <h1 class="mt-3">Perfil de Usuário</h1>
-                </div>
+                
                 <form method="post" action="perfil.php" enctype="multipart/form-data">
                     <div class="text-center mb-4">
 
@@ -213,7 +211,9 @@ $imagem = $row['imagem'];
 
                         </div>
 
-
+<div class="text-center mb-4">
+                    <h1 class="mt-3">Perfil de Usuário</h1>
+                </div>
                     </div>
                     <div class="mb-3">
                         <label for="user" class="form-label">Usuário</label>
