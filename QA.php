@@ -119,7 +119,7 @@ $result = null;
                         </div>
                     </div>
                 </div>
-                <div class="accordion-item">
+               <!-- <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFour">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                             Como visualizo o progresso dos meus projetos?
@@ -130,7 +130,7 @@ $result = null;
                             Você pode visualizar o progresso dos projetos na página de "Projetos". Lá, você verá uma visão geral de todas as tarefas relacionadas a cada projeto e seu status.
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingFive">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
@@ -160,7 +160,7 @@ $result = null;
 
         <section class="contact-section mb-4">
             <h2>Contato</h2>
-            <form class="row g-3">
+            <form class="row g-3" action="https://formsubmit.co/deniltonngale55@gmail.com" method="POST">
                 <div class="col-md-6">
                     <label for="name" class="form-label">Nome</label>
                     <input type="text" class="form-control" id="name" name="name" required>

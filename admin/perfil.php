@@ -86,8 +86,6 @@ $imagem = $row['imagem'];
 ?>
 
 <!DOCTYPE html>
-
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -148,18 +146,20 @@ $imagem = $row['imagem'];
         .btn-upload input {
             display: none;
         }
+
         #photo1 {
             max-width: 40px;
             max-height: 40px;
             width: auto;
             height: auto;
         }
-        .header a{
-          text-decoration: none;
-          text-transform: none;
-          color: #fff;
-          margin-right: 5px;
-          margin-left: 15px;
+
+        .header a {
+            text-decoration: none;
+            text-transform: none;
+            color: #fff;
+            margin-right: 5px;
+            margin-left: 15px;
         }
     </style>
 </head>
@@ -184,7 +184,6 @@ $imagem = $row['imagem'];
                 <li class="nav-item">
                     <a class="nav-link disabled" aria-disabled="true">SH4RKO</a>
                 </li>
-                
             </ul>
             <a href="perfil.php" class="header">
                 <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo1" class="img-fluid user-image" alt="User Image">
@@ -197,23 +196,16 @@ $imagem = $row['imagem'];
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="p-4 border shadow-lg rounded mt-4">
-                
                 <form method="post" action="perfil.php" enctype="multipart/form-data">
                     <div class="text-center mb-4">
-
-
                         <div class="image-container">
                             <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo" class="img-fluid" alt="User Image">
                             <label for="file" class="btn-upload">
                                 <i class="fas fa-camera"></i>
-                                <input type="file" id="file" name="imagem" accept="image/*" style="display: none;" onclick="sucesso()">
+                                <input type="file" id="file" name="imagem" accept="image/*" onclick="sucesso()">
                             </label>
-
                         </div>
-<div class="text-center mb-4">
-                    <h1 class="mt-3">Perfil de Usuário</h1>
-                </div>
-
+                        <h1 class="mt-3">Perfil de Usuário</h1>
                     </div>
                     <div class="mb-3">
                         <label for="user" class="form-label">Usuário</label>
@@ -240,10 +232,11 @@ $imagem = $row['imagem'];
 <footer class="footer">
     <p>© 2024 Denilton Ngale - SH4RKO</p>
 </footer>
-</body>
-</html>
 <script>
     function sucesso(){
-        print ("Foto de perfil atualizada com sucesso");
+        alert("Foto de perfil atualizada com sucesso");
     }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-xLhXg5DEEptOTI26DDwMeW3A7YF+ZBbDxfMzFq4z4geR/6eQDAxG/gy/6QdB8oeb" crossorigin="anonymous"></script>
+</body>
+</html>
