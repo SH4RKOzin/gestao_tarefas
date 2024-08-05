@@ -1,0 +1,111 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#div {
+    background-color: #351C75;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    
+}
+#div2{
+display: flex;
+justify-content: center;
+align-items: center;
+border: 0;
+padding: 0;
+
+}
+img{
+    height: 100px;
+    width: 100px;
+}
+form input{
+    margin-bottom: 15px;
+    margin-right: 15px;
+    size: 90%;
+}
+h1 {
+    text-align: center;
+    color: white;
+    border: 0;
+}
+
+label {
+    font-weight: bold;
+    color: white;
+}
+
+input[type="text"]{
+    width: 95%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+}
+input[type="email"]{
+    width: 95%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+}
+input[type="password"]{
+    width: 95%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+}
+input[type="date"]{
+    width: 95%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #fff;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+p {
+    text-align: center;
+    color: white;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}  

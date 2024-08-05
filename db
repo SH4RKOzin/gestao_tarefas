@@ -1,0 +1,18 @@
+CREATE DATABASE tarefas;
+USE tarefas;
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    user VARCHAR(50) NOT NULL UNIQUE,
+    pass VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE usuario_<user_id>_tarefas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tarefa VARCHAR(255) NOT NULL,
+    data_inicio DATE,
+    data_fim DATE,
+    estado ENUM("Em andamento", "concluida", "Nao iniciada") DEFAULT "Nao iniciada"
+);
+
+
