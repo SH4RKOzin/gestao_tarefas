@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $pass = $_POST['pass'];
 
     // Prepara a consulta SQL para obter o usuário pelo nome de usuário e senha
-    $sql = "SELECT id, user FROM usuarios WHERE user = ? AND pass = ?";
+    $sql = "SELECT id, user, tipo FROM usuarios WHERE user = ? AND pass = ?";
     $stmt = $conn->prepare($sql);
 
     // Verifica se a preparação da consulta foi bem-sucedida
@@ -74,14 +74,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $usuario = $result->fetch_assoc();
         $_SESSION['id'] = $usuario['id'];
         $_SESSION['user'] = $usuario['user'];
+        $_SESSION['tipo'] = $usuario['tipo'];
         $stmt->close(); // Fecha o statement
 
-        // Redireciona para a página do usuário após o login
-        header('Location: index.php');
-        exit;
-    } else {
-        $erro = "Usuário ou senha inválidos!";
-    }
-}
+        if ($usuario['tipo'] == 'Corporativa') {
+            header("location: ./admin/index.php");
+            exit;
+         } else {
+            header("location: index.php");
+            exit;
+         }
+      } else {
+         $error[] = "Falha ao logar! E-mail ou senha incorretos";
+      }
+   }
+
+
 ?>
 

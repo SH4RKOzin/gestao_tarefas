@@ -6,7 +6,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = $_POST['user'];
     $pass = $_POST['pass'];
     $email = $_POST['email'];
+    $tipo = $_POST['tipo'];
     $imagem = "user.png";
+
+    // Basic validation
+    if (empty($user) || empty($pass) || empty($email) || empty($tipo)) {
+        $_SESSION['error_message'] = "Todos os campos são obrigatórios.";
+        header('Location: criarusuario.php');
+        exit;
+    }
+
     // Verifica se o usuário já existe
     $stmt = $conn->prepare("SELECT id FROM usuarios WHERE user = ?");
     $stmt->bind_param("s", $user);
@@ -15,16 +24,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->num_rows > 0) {
         $_SESSION['error_message'] = "Usuário já existe.";
+        $stmt->close();
         header('Location: criarusuario.php');
         exit;
     }
-
     $stmt->close();
 
-    // Insere o novo usuário
+    // Hash da senha
+   
 
-    $stmt = $conn->prepare("INSERT INTO usuarios (user, pass, email, imagem) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $user, $pass, $email, $imagem);
+    // Insere o novo usuário
+    $stmt = $conn->prepare("INSERT INTO usuarios (user, pass, email, imagem, tipo) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $user, $pass, $email, $imagem, $tipo);
 
     if ($stmt->execute()) {
         // Obtenha o ID do usuário recém-criado
@@ -37,7 +48,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             tarefa VARCHAR(255) NOT NULL,
             data_inicio DATE,
             data_fim DATE,
-            estado VARCHAR(255)
+            estado VARCHAR(255),
+            alocacao VARCHAR(200) NOT NULL,
+            descricao VARCHAR(2000) NOT NULL
         )";
 
         if ($conn->query($create_table_sql) === TRUE) {
@@ -58,29 +71,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Usuário</title>
-    <link href="S4 LOGO.png" rel="icon">
+    <link href="S4 LOGO.png" rel="icon" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-</head>
-<body>
-<style>
-     body {
+    <style>
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
         }
         .form-container {
             max-width: 500px; /* Ajuste o valor conforme necessário */
+            width: 100%;
         }
         .centered-text {
             text-align: center;
         }
-</style>
+    </style>
+</head>
+<body>
+
 <?php if (isset($_SESSION['error_message'])): ?>
     <div class="container">
         <div class="row justify-content-center">
@@ -92,10 +109,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php unset($_SESSION['error_message']); ?>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['success_message'])): ?>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="alert alert-success mt-4"><?php echo $_SESSION['success_message']; ?></div>
+            </div>
+        </div>
+    </div>
+    <?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <form action="criarusuario.php" method="POST" class="p-4 border shadow-lg rounded mt-4">
+            <form action="criarusuario.php" method="POST" class="p-4 border shadow-lg rounded form-container mt-4">
                 <div class="text-center mb-4">
                     <img src="S4 LOGO.png" alt="S4 Logo" width="200" height="200">
                     <h1 class="mt-3">Criar Usuário</h1>
@@ -104,10 +132,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="user" class="form-label">Usuário</label>
                     <input type="text" class="form-control" name="user" id="user" required>
                 </div>
-                
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" name="email" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="tipo" class="form-label">Tipo de conta</label>
+                    <select class="form-select" name="tipo" id="tipo" required>
+                        <option value="Pessoal">Pessoal</option>
+                        <option value="Corporativa">Corporativa</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="pass" class="form-label">Senha</label>

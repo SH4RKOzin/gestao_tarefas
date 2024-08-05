@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     user VARCHAR(50) NOT NULL UNIQUE,
-    pass VARCHAR(255) NOT NULL
+    pass VARCHAR(255) NOT NULL,
+    imagem VARCHAR(200),
+    tipo VARCHAR(20)
 );
 
 CREATE TABLE usuario_<user_id>_tarefas (
@@ -12,7 +14,9 @@ CREATE TABLE usuario_<user_id>_tarefas (
     tarefa VARCHAR(255) NOT NULL,
     data_inicio DATE,
     data_fim DATE,
-    estado ENUM("Em andamento", "concluida", "Nao iniciada") DEFAULT "Nao iniciada"
+    estado ENUM("Em andamento", "concluida", "Nao iniciada") DEFAULT "Nao iniciada",
+    alocacao varchar(200) NOT NULL,
+    descricao varchar(2000) NOT NULL
 );
 
 
