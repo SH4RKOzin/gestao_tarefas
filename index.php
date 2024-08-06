@@ -15,7 +15,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
-    $imagem = $row['imagem']; // Assume que o nome do arquivo da imagem está armazenado no banco de dados
+    $imagem = $row['imagem']; // Assume que o  do arquivo da imagem está armazenado no banco de dados
 } else {
     $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
     exit();

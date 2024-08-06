@@ -50,7 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             data_fim DATE,
             estado VARCHAR(255),
             alocacao VARCHAR(200) NOT NULL,
-            descricao VARCHAR(2000) NOT NULL
+            descricao VARCHAR(2000) NOT NULL,
+            projeto VARCHAR(200)
         )";
 
         if ($conn->query($create_table_sql) === TRUE) {

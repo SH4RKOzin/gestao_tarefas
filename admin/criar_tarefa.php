@@ -19,11 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $estado = $_POST['estado'];
     $alocacao = $_POST['alocacao'];
     $descricao = $_POST['descricao'];
+    $projeto = $_POST['projeto'];
 
     
     // Prepara a declaração SQL para inserir a nova tarefa
-    $stmt = $conn->prepare("INSERT INTO usuario_{$user_id}_tarefas (tarefa, data_inicio, data_fim, estado, alocacao, descricao) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $tarefa, $data_inicio, $data_fim, $estado, $alocacao, $descricao);
+    $stmt = $conn->prepare("INSERT INTO usuario_{$user_id}_tarefas (tarefa, data_inicio, data_fim, estado, alocacao, descricao, projeto) VALUES (?, ?, ?, ?, ?, ?,?)");
+    $stmt->bind_param("sssssss", $tarefa, $data_inicio, $data_fim, $estado, $alocacao, $descricao, $projeto);
 
     // Executa a declaração preparada
     if ($stmt->execute()) {
@@ -35,9 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header('Location: criar_tarefa.php');
         exit;
     }
-
     // Fecha o statement
-    $stmt->close();
 }
 $stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -111,6 +110,9 @@ $result = null;
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
         <li class="nav-item">
+                    <a class="nav-link" href="projetos.php">Projetos</a>
+                </li>
+        <li class="nav-item">
           <a class="nav-link" href="QA.php">Q&A</a>
         </li>
         <li class="nav-item">
@@ -139,6 +141,10 @@ $result = null;
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descricao</label>
                     <input type="text" class="form-control" name="descricao" id="descricao" required>
+                </div>
+                <div class="mb-3">
+                    <label for="projeto" class="form-label">Projeto</label>
+                    <input type="text" class="form-control" name="projeto" id="projeto" required>
                 </div>
                 <div class="mb-3">
                     <label for="data_inicio" class="form-label">Data de Início</label>

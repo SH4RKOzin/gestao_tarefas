@@ -12,11 +12,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE usuario_<user_id>_tarefas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tarefa VARCHAR(255) NOT NULL,
+    descricao varchar(2000) NOT NULL,
     data_inicio DATE,
     data_fim DATE,
     estado ENUM("Em andamento", "concluida", "Nao iniciada") DEFAULT "Nao iniciada",
     alocacao varchar(200) NOT NULL,
-    descricao varchar(2000) NOT NULL
+    projeto VARCHAR(200)
 );
 
 

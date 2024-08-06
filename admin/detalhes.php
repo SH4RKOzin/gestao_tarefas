@@ -28,7 +28,7 @@ if ($result->num_rows == 1) {
 $stmt->close();
 
 // Consulta as tarefas do usuário
-$stmt = $conn->prepare("SELECT id, tarefa, descricao, alocacao, estado FROM usuario_" . $user_id . "_tarefas");
+$stmt = $conn->prepare("SELECT * FROM usuario_" . $user_id . "_tarefas");
 $stmt->execute();
 $tasks_result = $stmt->get_result();
 
@@ -74,6 +74,9 @@ $conn->close();
                     <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="projetos.php">Projetos</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="QA.php">Q&A</a>
                 </li>
                 <li class="nav-item">
@@ -96,8 +99,11 @@ $conn->close();
                         <th>#</th>
                         <th>Tarefa</th>
                         <th>Descrição</th>
+                        <th>Projeto</th>
                         <th>Alocado a</th>
                         <th>Estado</th>
+                        <th>Inicio</th>
+                        <th>Fim</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -107,7 +113,10 @@ $conn->close();
                             <td><?php echo htmlspecialchars($task['id']); ?></td>
                             <td><?php echo htmlspecialchars($task['tarefa']); ?></td>
                             <td><?php echo htmlspecialchars($task['descricao']); ?></td>
+                            <td><?php echo htmlspecialchars($task['projeto']); ?></td>
                             <td><?php echo htmlspecialchars($task['alocacao']); ?></td>
+                            <td><?php echo htmlspecialchars($task['data_inicio']); ?></td>
+                            <td><?php echo htmlspecialchars($task['data_fim']); ?></td>
                             <td><?php echo htmlspecialchars($task['estado']); ?></td>
                             <td>
                                 <a href="editar_tarefa.php?id=<?php echo $task['id']; ?>" class="btn btn-primary btn-sm">
