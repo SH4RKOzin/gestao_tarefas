@@ -4,7 +4,7 @@ session_start();
 
 $user_id = $_SESSION['id'];
 $user = $_SESSION['user'];
-// Consulta os dados do usuário
+
 $stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -12,12 +12,12 @@ $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
-    $imagem = $row['imagem']; // Assume que o nome do arquivo da imagem está armazenado no banco de dados
+    $imagem = $row['imagem']; 
 } else {
     $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
     exit();
 }
-// Inicializa a variável $result
+
 $result = null;
 ?>
 <!DOCTYPE html>
@@ -26,7 +26,7 @@ $result = null;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suporte e Ajuda</title>
-    <!-- Link para o Bootstrap CSS -->
+    <link href="S4 LOGO.png" rel="icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <style>
     #photo {
@@ -180,7 +180,6 @@ $result = null;
         </section>
     </div>
 
-    <!-- Script para o Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -2,12 +2,12 @@
 include("conexao.php");
 session_start();
 if (!isset($_SESSION['id'])) {
-    header("Location: login.php");
+    header("Location: login.html");
     exit();
 }
 $user_id = $_SESSION['id'];
 $user = $_SESSION['user'];
-// Consulta os dados do usuário
+
 $stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -15,18 +15,17 @@ $result = $stmt->get_result();
 
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
-    $imagem = $row['imagem']; // Assume que o nome do arquivo da imagem está armazenado no banco de dados
+    $imagem = $row['imagem']; 
 } else {
     $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
     exit();
 }
-// Inicializa a variável $result
 $result = null;
 
 if (!empty($_GET['search'])) {
     $search_term = "%{$_GET['search']}%";
     $stmt = $conn->prepare("SELECT * FROM usuario_{$user_id}_tarefas WHERE estado LIKE ? OR tarefa LIKE ?");
-    $stmt->bind_param("ss", $search_term, $search_term); // Corrigido para dois "s", pois temos dois placeholders
+    $stmt->bind_param("ss", $search_term, $search_term); 
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
@@ -90,9 +89,9 @@ if (!empty($_GET['search'])) {
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
-        <li class="nav-item">
+        <!--<li class="nav-item">
                     <a class="nav-link" href="projetos.php">Projetos</a>
-                </li>
+                </li>-->
         <li class="nav-item">
           <a class="nav-link" href="QA.php">Q&A</a>
         </li>
@@ -101,8 +100,8 @@ if (!empty($_GET['search'])) {
         </li>
       </ul>
       <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" id="pesquisar"> <!-- Corrigido para id="pesquisar" -->
-        <button class="btn btn-outline-success" type="button" onclick="searchData()">Pesquisar</button> <!-- Corrigido para type="button" -->
+        <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar" id="pesquisar">
+        <button class="btn btn-outline-success" type="button" onclick="searchData()">Pesquisar</button>
       </form>
       <a href="perfil.php">
                 <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo" class="img-fluid user-image" alt="User Image">
@@ -112,15 +111,15 @@ if (!empty($_GET['search'])) {
 </nav>
 
 <script>
-    var pesquisar = document.getElementById("pesquisar"); // Corrigido para pesquisar
-    pesquisar.addEventListener("keydown", function(event) { // Corrigido para pesquisar
+    var pesquisar = document.getElementById("pesquisar"); 
+    pesquisar.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
             searchData();
         }
     });
 
     function searchData() {
-        window.location = 'index.php?search=' + pesquisar.value; // Corrigido para pesquisar
+        window.location = 'index.php?search=' + pesquisar.value;
     }
 </script>
 
@@ -166,9 +165,6 @@ if (!empty($_GET['search'])) {
         </div>
     </div>
 </div>
-<footer class="footer">
-    <p>© 2024 Denilton Ngale - SH4RKO</p>
-</footer>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-9anC3EepQ3LKW0zQf5L5Ive2f0WmE9zuXFvrDhUto29T95rQD+/ZvsKbF0JDLiXt" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-1Y3PqNigMqN4DKP8SivXQODV5OPoA1pM9Y2OoDq9bsA4DlOi+CIyTE5lMzyfc6+C" crossorigin="anonymous"></script>
 </body>

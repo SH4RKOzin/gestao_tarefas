@@ -3,16 +3,31 @@ session_start();
 include("conexao.php");
 
 if (!isset($_SESSION['id'])) {
-    header("Location: login.php");
+    header("Location: login.html");
     exit();
 }
 
 $user_id = $_SESSION['id'];
 
-// Handling GET request to fetch task details for editing
+
+$stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows == 1) {
+    $row = $result->fetch_assoc();
+    $imagem = $row['imagem']; 
+} else {
+    $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
+    exit();
+}
+$result->free();
+
+
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
     $tarefa_id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT tarefa, data_inicio, data_fim, estado FROM usuario_{$user_id}_tarefas WHERE id = ?");
+    $stmt = $conn->prepare("SELECT * FROM usuario_{$user_id}_tarefas WHERE id = ?");
     $stmt->bind_param("i", $tarefa_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -23,6 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
         $data_inicio = $row['data_inicio'];
         $data_fim = $row['data_fim'];
         $estado = $row['estado'];
+        $descricao = $row['descricao'];
     } else {
         $_SESSION['error_message'] = "Tarefa não encontrada.";
         header('Location: index.php');
@@ -32,16 +48,17 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
     $stmt->close();
 }
 
-// Handling POST request to update task details
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tarefa_id = $_POST['id'];
     $tarefa = $_POST['tarefa'];
     $data_inicio = $_POST['data_inicio'];
     $data_fim = $_POST['data_fim'];
     $estado = $_POST['estado'];
+    $descricao = $_POST['descricao'];
+    
 
-    $stmt = $conn->prepare("UPDATE usuario_{$user_id}_tarefas SET tarefa = ?, data_inicio=?, data_fim=?, estado = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $tarefa, $data_inicio, $data_fim, $estado, $tarefa_id);
+    $stmt = $conn->prepare("UPDATE usuario_{$user_id}_tarefas SET tarefa = ?, data_inicio = ?, data_fim = ?, estado = ?, descricao = ? WHERE id = ?");
+    $stmt->bind_param("sssssi", $tarefa, $data_inicio, $data_fim, $estado, $descricao, $tarefa_id);
 
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Tarefa atualizada com sucesso.";
@@ -65,55 +82,74 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Editar Tarefa</title>
     <link href="S4 LOGO.png" rel="icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<style>
-    body {
+    <style>
+        body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
         .footer {
             width: 100%;
-            background-color: #343a40;;
+            background-color: #343a40;
             text-align: center;
             position: absolute;
             bottom: 0;
         }
-        .footer p{
-          color: white;
+        .footer p {
+            color: white;
         }
-</style>
+        #photo1 {
+            max-width: 40px;
+            max-height: 40px;
+            width: auto;
+            height: auto;
+        }
+        a {
+            text-decoration: none;
+            text-transform: none;
+            color: #fff;
+            margin-right: 5px;
+            margin-left: 15px;
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-        <img src="S4 LOGO.png" alt="" width="50px" height="50px">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="index.php">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="perfil.php">Perfil</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">SH4RKO</a>
-        </li>
-      </ul>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="S4 LOGO.png" alt="" width="50px" height="50px">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link" href="projetos.php">Projetos</a>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link" href="QA.php">Q&A</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">SH4RKO</a>
+                </li>
+            </ul>
+            <a href="perfil.php" class="header">
+                <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo1" class="img-fluid user-image" alt="User Image">
+            </a>
+        </div>
     </div>
-  </div>
 </nav>
+
 <?php if (isset($_SESSION['error_message'])): ?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="alert alert-danger mt-4" role="alert">
-                <?php echo $_SESSION['error_message']; ?>
+                <?php echo htmlspecialchars($_SESSION['error_message']); ?>
             </div>
         </div>
     </div>
@@ -132,24 +168,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($tarefa_id); ?>">
                 <div class="mb-3">
                     <label for="tarefa" class="form-label">Tarefa</label>
-                    <input type="text" class="form-control" name="tarefa" id="tarefa" value="<?php echo htmlspecialchars($tarefa); ?>" required>
+                    <input type="text" class="form-control" name="tarefa" id="tarefa" value="<?php echo htmlspecialchars($tarefa); ?>" >
                 </div>
                 <div class="mb-3">
-                    <label for="data_inicio" class="form-label">Data de Inicio</label>
-                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" value="<?php echo htmlspecialchars($data_inicio); ?>" required>
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" name="descricao" id="descricao" value="<?php echo htmlspecialchars($descricao); ?>" >
+                </div>
+                <div class="mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início</label>
+                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" value="<?php echo htmlspecialchars($data_inicio); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="data_fim" class="form-label">Data de Fim</label>
-                    <input type="date" class="form-control" name="data_fim" id="data_fim" value="<?php echo htmlspecialchars($data_fim); ?>" required>
+                    <input type="date" class="form-control" name="data_fim" id="data_fim" value="<?php echo htmlspecialchars($data_fim); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado</label>
-                    <select class="form-control" name="estado" id="estado" required>
-                        <option value="Pendente" <?php echo ($estado === 'Pendente') ? 'selected' : ''; ?>>Pendente</option>
+                    <select class="form-control" name="estado" id="estado" >
+                        <option disabled value="">Selecione o estado</option>
+                        <option value="Nao iniciada" <?php echo ($estado === 'Nao iniciada') ? 'selected' : ''; ?>>Não iniciada</option>
                         <option value="Em andamento" <?php echo ($estado === 'Em andamento') ? 'selected' : ''; ?>>Em andamento</option>
                         <option value="Concluída" <?php echo ($estado === 'Concluída') ? 'selected' : ''; ?>>Concluída</option>
                     </select>
-                </div><hr>
+                </div>
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary me-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
@@ -170,9 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
-<footer class="footer">
-    <p>© 2024 Denilton Ngale - SH4RKO</p>
-</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-9anC3EepQ3LKW0zQf5L5Ive2f0WmE9zuXFvrDhUto29T95rQD+/ZvsKbF0JDLiXt" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-1Y3PqNigMqN4DKP8SivXQODV5OPoA1pM9Y2OoDq9bsA4DlOi+CIyTE5lMzyfc6+C" crossorigin="anonymous"></script>
 </body>

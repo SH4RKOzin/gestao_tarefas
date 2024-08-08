@@ -19,5 +19,3 @@ CREATE TABLE usuario_<user_id>_tarefas (
     alocacao varchar(200) NOT NULL,
     projeto VARCHAR(200)
 );
-
-

@@ -2,17 +2,17 @@
 session_start();
 include("conexao.php");
 
-// Verifica se o usuário está logado
+
 if (!isset($_SESSION['id'])) {
-    header("Location: login.php");
+    header("Location: login.html");
     exit();
 }
 
 $user_id = $_SESSION['id'];
 
-// Verifica se a requisição é do tipo POST
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obtém os dados do formulário
+
     $tarefa = $_POST['tarefa'];
     $data_inicio = $_POST['data_inicio'];
     $data_fim = $_POST['data_fim'];
@@ -21,37 +21,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $descricao = $_POST['descricao'];
     $projeto = $_POST['projeto'];
 
-    
-    // Prepara a declaração SQL para inserir a nova tarefa
-    $stmt = $conn->prepare("INSERT INTO usuario_{$user_id}_tarefas (tarefa, data_inicio, data_fim, estado, alocacao, descricao, projeto) VALUES (?, ?, ?, ?, ?, ?,?)");
-    $stmt->bind_param("sssssss", $tarefa, $data_inicio, $data_fim, $estado, $alocacao, $descricao, $projeto);
+    if ($stmt = $conn->prepare("INSERT INTO usuario_{$user_id}_tarefas (tarefa, data_inicio, data_fim, estado, alocacao, descricao, projeto) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+        $stmt->bind_param("sssssss", $tarefa, $data_inicio, $data_fim, $estado, $alocacao, $descricao, $projeto);
 
-    // Executa a declaração preparada
-    if ($stmt->execute()) {
-        $_SESSION['success_message'] = "Tarefa criada com sucesso.";
-        header('Location: index.php');
-        exit;
+        if ($stmt->execute()) {
+            $_SESSION['success_message'] = "Tarefa criada com sucesso.";
+            header('Location: index.php');
+            exit;
+        } else {
+            $_SESSION['error_message'] = "Erro ao criar tarefa.";
+            header('Location: criar_tarefa.php');
+            exit;
+        }
     } else {
-        $_SESSION['error_message'] = "Erro ao criar tarefa.";
+        $_SESSION['error_message'] = "Erro ao preparar a consulta.";
         header('Location: criar_tarefa.php');
         exit;
     }
-    // Fecha o statement
 }
-$stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
 
-if ($result->num_rows == 1) {
-    $row = $result->fetch_assoc();
-    $imagem = $row['imagem']; // Assume que o nome do arquivo da imagem está armazenado no banco de dados
-} else {
-    $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
-    exit();
+if ($stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?")) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+        $row = $result->fetch_assoc();
+        $imagem = $row['imagem'];
+    } else {
+        $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
+        exit();
+    }
+    $stmt->close();
 }
-// Inicializa a variável $result
-$result = null;
 ?>
 
 <!DOCTYPE html>
@@ -62,8 +64,9 @@ $result = null;
     <title>Criar Tarefa</title>
     <link href="S4 LOGO.png" rel="icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<style>
-    body {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -71,13 +74,13 @@ $result = null;
 
         .footer {
             width: 100%;
-            background-color: #343a40;;
+            background-color: #343a40;
             text-align: center;
             position: absolute;
             bottom: 0;
         }
-        .footer p{
-          color: white;
+        .footer p {
+            color: white;
         }
         #photo {
             max-width: 40px;
@@ -85,14 +88,17 @@ $result = null;
             width: auto;
             height: auto;
         }
-        a{
-          text-decoration: none;
-          text-transform: none;
-          color: #fff;
-          margin-right: 5px;
-          margin-left: 15px;
+        a {
+            text-decoration: none;
+            text-transform: none;
+            color: #fff;
+            margin-right: 5px;
+            margin-left: 15px;
         }
-</style>
+        .error-message {
+            font-size: 0.875em;
+        }
+    </style>
 </head>
 <body>
 
@@ -110,9 +116,6 @@ $result = null;
           <a class="nav-link active" aria-current="page" href="index.php">Home</a>
         </li>
         <li class="nav-item">
-                    <a class="nav-link" href="projetos.php">Projetos</a>
-                </li>
-        <li class="nav-item">
           <a class="nav-link" href="QA.php">Q&A</a>
         </li>
         <li class="nav-item">
@@ -120,8 +123,8 @@ $result = null;
         </li>
       </ul>
       <a href="perfil.php">
-                <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo" class="img-fluid user-image" alt="User Image">
-            </a>
+        <img src="<?php echo htmlspecialchars($imagem ? './img/' . htmlspecialchars($imagem) : 'user.png'); ?>" id="photo" class="img-fluid user-image" alt="User Image">
+      </a>
     </div>
   </div>
 </nav>
@@ -136,32 +139,33 @@ $result = null;
                 </div>
                 <div class="mb-3">
                     <label for="tarefa" class="form-label">Tarefa</label>
-                    <input type="text" class="form-control" name="tarefa" id="tarefa" required>
+                    <input type="text" class="form-control" name="tarefa" id="tarefa" >
                 </div>
                 <div class="mb-3">
-                    <label for="descricao" class="form-label">Descricao</label>
-                    <input type="text" class="form-control" name="descricao" id="descricao" required>
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" name="descricao" id="descricao" >
                 </div>
                 <div class="mb-3">
                     <label for="projeto" class="form-label">Projeto</label>
-                    <input type="text" class="form-control" name="projeto" id="projeto" required>
+                    <input type="text" class="form-control" name="projeto" id="projeto">
                 </div>
                 <div class="mb-3">
                     <label for="data_inicio" class="form-label">Data de Início</label>
-                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" required>
+                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" >
                 </div>
                 <div class="mb-3">
                     <label for="data_fim" class="form-label">Data de Fim</label>
-                    <input type="date" class="form-control" name="data_fim" id="data_fim" required>
+                    <input type="date" class="form-control" name="data_fim" id="data_fim" >
                 </div>
                 <div class="mb-3">
                     <label for="alocacao" class="form-label">Alocado a</label>
-                    <input type="text" class="form-control" name="alocacao" id="alocacao" required>
+                    <input type="text" class="form-control" name="alocacao" id="alocacao" >
                 </div>
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado</label>
-                    <select class="form-control" name="estado" id="estado" required>
-                        <option value="Nao iniciada">Nao iniciada</option>
+                    <select class="form-control" name="estado" id="estado" >
+                        <option value="">Selecione o estado</option>
+                        <option value="Nao iniciada">Não iniciada</option>
                         <option value="Em andamento">Em andamento</option>
                         <option value="Concluída">Concluída</option>
                     </select>
@@ -187,7 +191,42 @@ $result = null;
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-9anC3EepQ3LKW0zQf5L5Ive2f0WmE9zuXFvrDhUto29T95rQD+/ZvsKbF0JDLiXt" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-1Y3PqNigMqN4DKP8SivXQODV5OPoA1pM9Y2OoDq9bsA4DlOi+CIyTE5lMzyfc6+C" crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function() {
+    $('form').submit(function(event) {
+        $('.error-message').remove();
+        let isValid = true;
+        if ($('#tarefa').val().trim() === '') {
+            $('#tarefa').after('<div class="error-message text-danger">O campo tarefa é obrigatório.</div>');
+            isValid = false;
+        }
+        if ($('#descricao').val().trim() === '') {
+            $('#descricao').after('<div class="error-message text-danger">O campo descrição é obrigatório.</div>');
+            isValid = false;
+        }
+        if ($('#data_inicio').val() === '') {
+            $('#data_inicio').after('<div class="error-message text-danger">O campo data de início é obrigatório.</div>');
+            isValid = false;
+        }
+        if ($('#data_fim').val() === '') {
+            $('#data_fim').after('<div class="error-message text-danger">O campo data de fim é obrigatório.</div>');
+            isValid = false;
+        }
+        if ($('#alocacao').val().trim() === '') {
+            $('#alocacao').after('<div class="error-message text-danger">O campo alocação é obrigatório.</div>');
+            isValid = false;
+        }
+        if ($('#estado').val() === '') {
+            $('#estado').after('<div class="error-message text-danger">O campo estado é obrigatório.</div>');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
 </body>
 </html>

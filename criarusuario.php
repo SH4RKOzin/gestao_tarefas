@@ -9,14 +9,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tipo = $_POST['tipo'];
     $imagem = "user.png";
 
-    // Basic validation
     if (empty($user) || empty($pass) || empty($email) || empty($tipo)) {
         $_SESSION['error_message'] = "Todos os campos são obrigatórios.";
         header('Location: criarusuario.php');
         exit;
     }
 
-    // Verifica se o usuário já existe
     $stmt = $conn->prepare("SELECT id FROM usuarios WHERE user = ?");
     $stmt->bind_param("s", $user);
     $stmt->execute();
@@ -30,19 +28,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $stmt->close();
 
-    // Hash da senha
-   
-
-    // Insere o novo usuário
     $stmt = $conn->prepare("INSERT INTO usuarios (user, pass, email, imagem, tipo) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $user, $pass, $email, $imagem, $tipo);
 
     if ($stmt->execute()) {
-        // Obtenha o ID do usuário recém-criado
         $user_id = $stmt->insert_id;
         $stmt->close();
 
-        // Cria a tabela de tarefas para o novo usuário
+  
         $create_table_sql = "CREATE TABLE usuario_" . $user_id . "_tarefas (
             id INT AUTO_INCREMENT PRIMARY KEY,
             tarefa VARCHAR(255) NOT NULL,
@@ -56,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($conn->query($create_table_sql) === TRUE) {
             $_SESSION['success_message'] = "Usuário criado com sucesso.";
-            header('Location: login.php');
+            header('Location: login.html');
             exit;
         } else {
             $_SESSION['error_message'] = "Erro ao criar tabela de tarefas.";
@@ -89,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #f8f9fa;
         }
         .form-container {
-            max-width: 500px; /* Ajuste o valor conforme necessário */
+            max-width: 500px; 
             width: 100%;
         }
         .centered-text {
@@ -149,7 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="password" class="form-control" name="pass" id="pass" required>
                 </div>
                 <button type="submit" class="btn btn-primary d-block mx-auto">Criar Usuário</button>
-                <p class="mt-3 text-center">Já possui uma conta? <a href="login.php">Faça login</a>.</p>
+                <p class="mt-3 text-center">Já possui uma conta? <a href="login.html">Faça login</a>.</p>
             </form>
         </div>
     </div>

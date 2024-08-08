@@ -3,15 +3,15 @@ calcular o progresso quanto ao estado das tarefas com o mesmo projeto
 include("conexao.php");
 session_start();
 
-// Check if user is logged in
+
 if (!isset($_SESSION['id'])) {
-    header("Location: login.php");
+    header("Location: login.html");
     exit();
 }
 
 $user_id = $_SESSION['id'];
 
-// Retrieve user image
+
 $stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -19,15 +19,14 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     $row = $result->fetch_assoc();
-    $imagem = $row['imagem'] ?? 'user.png'; // Default image if not set
+    $imagem = $row['imagem'] ?? 'user.png'; 
 } else {
     $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
-    header("Location: error.php"); // Redirect to error page
+    header("Location: error.php"); 
     exit();
 }
 
-// Retrieve user projects
-// Note: Assuming 'id' is used to query tasks. If it's not, change as needed.
+
 $table_name = "usuario_{$user_id}_tarefas";
 $stmt = $conn->prepare("SELECT projeto FROM {$table_name} WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -36,7 +35,7 @@ $projects_result = $stmt->get_result();
 
 if ($projects_result === false) {
     $_SESSION['error_message'] = "Erro ao carregar projetos.";
-    header("Location: error.php"); // Redirect to error page
+    header("Location: error.php"); 
     exit();
 }
 ?>
@@ -113,7 +112,7 @@ if ($projects_result === false) {
                 <?php while ($row = $projects_result->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($row['projeto']); ?></td>
-                        <!-- Add columns for progresso and ações if needed -->
+                        
                     </tr>
                 <?php endwhile; ?>
                 </tbody>

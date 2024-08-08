@@ -7,6 +7,6 @@ session_destroy();
     alert("Você terminou a sessão");
 </script>
 <?php
-header("Location: login.php");
+header("Location: login.html");
 exit();
 ?>

@@ -2,7 +2,6 @@
 session_start();
 include("conexao.php");
 
-
 if (!isset($_SESSION['id'])) {
     header("Location: login.html");
     exit();
@@ -10,43 +9,69 @@ if (!isset($_SESSION['id'])) {
 
 $user_id = $_SESSION['id'];
 
-if ($stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?")) {
-    $stmt->bind_param("i", $user_id);
+
+$stmt = $conn->prepare("SELECT imagem FROM usuarios WHERE id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows == 1) {
+    $row = $result->fetch_assoc();
+    $imagem = $row['imagem']; 
+} else {
+    $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
+    exit();
+}
+$result->free();
+
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
+    $tarefa_id = $_GET['id'];
+    $stmt = $conn->prepare("SELECT * FROM usuario_{$user_id}_tarefas WHERE id = ?");
+    $stmt->bind_param("i", $tarefa_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows == 1) {
         $row = $result->fetch_assoc();
-        $imagem = $row['imagem'];
+        $tarefa = $row['tarefa'];
+        $data_inicio = $row['data_inicio'];
+        $data_fim = $row['data_fim'];
+        $estado = $row['estado'];
+        $descricao = $row['descricao'];
+        $projeto = $row['projeto'];
     } else {
-        $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
-        exit();
+        $_SESSION['error_message'] = "Tarefa não encontrada.";
+        header('Location: index.php');
+        exit;
     }
+
     $stmt->close();
 }
 
-
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    $tarefa_id = $_POST['id'];
     $tarefa = $_POST['tarefa'];
     $data_inicio = $_POST['data_inicio'];
     $data_fim = $_POST['data_fim'];
     $estado = $_POST['estado'];
     $descricao = $_POST['descricao'];
+    $projeto = $_POST['projeto'];
 
-    $stmt = $conn->prepare("INSERT INTO usuario_{$user_id}_tarefas (tarefa, data_inicio, data_fim, estado, descricao) VALUES (?, ?, ?, ?,?)");
-    $stmt->bind_param("sssss", $tarefa, $data_inicio, $data_fim, $estado, $descricao);
+    $stmt = $conn->prepare("UPDATE usuario_{$user_id}_tarefas SET tarefa = ?, data_inicio = ?, data_fim = ?, estado = ?, descricao = ?, projeto = ? WHERE id = ?");
+    $stmt->bind_param("ssssssi", $tarefa, $data_inicio, $data_fim, $estado, $descricao, $projeto, $tarefa_id);
 
     if ($stmt->execute()) {
-        $_SESSION['success_message'] = "Tarefa criada com sucesso.";
+        $_SESSION['success_message'] = "Tarefa atualizada com sucesso.";
         header('Location: index.php');
         exit;
     } else {
-        $_SESSION['error_message'] = "Erro ao criar tarefa.";
-        header('Location: criar_tarefa.php');
+        $_SESSION['error_message'] = "Erro ao atualizar tarefa.";
+        header('Location: editar_tarefa.php?id=' . $tarefa_id);
         exit;
     }
+
+    $stmt->close();
 }
 ?>
 
@@ -55,26 +80,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Tarefa</title>
+    <title>Editar Tarefa</title>
     <link href="S4 LOGO.png" rel="icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<style>
-    body {
+    <style>
+        body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-
         .footer {
             width: 100%;
-            background-color: #343a40;;
+            background-color: #343a40;
             text-align: center;
             position: absolute;
             bottom: 0;
         }
-        .footer p{
-          color: white;
+        .footer p {
+            color: white;
         }
         #photo1 {
             max-width: 40px;
@@ -82,17 +105,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: auto;
             height: auto;
         }
-        a{
-          text-decoration: none;
-          text-transform: none;
-          color: #fff;
-          margin-right: 5px;
-          margin-left: 15px;
+        a {
+            text-decoration: none;
+            text-transform: none;
+            color: #fff;
+            margin-right: 5px;
+            margin-left: 15px;
         }
-</style>
+    </style>
 </head>
 <body>
-
 <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -123,36 +145,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </nav>
 
+<?php if (isset($_SESSION['error_message'])): ?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <form action="criar_tarefa.php" method="POST" class="p-4 border shadow-lg rounded mt-4">
+            <div class="alert alert-danger mt-4" role="alert">
+                <?php echo htmlspecialchars($_SESSION['error_message']); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php unset($_SESSION['error_message']); ?>
+<?php endif; ?>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="editar_tarefa.php" method="POST" class="p-4 border shadow-lg rounded mt-4">
                 <div class="text-center mb-4">
                     <img src="S4 LOGO.png" alt="S4 Logo" width="200" height="200">
-                    <h1 class="mt-3">Criar Tarefa</h1>
+                    <h1 class="mt-3">Editar Tarefa</h1>
                 </div>
+                <input type="hidden" name="id" value="<?php echo htmlspecialchars($tarefa_id); ?>">
                 <div class="mb-3">
                     <label for="tarefa" class="form-label">Tarefa</label>
-                    <input type="text" class="form-control" name="tarefa" id="tarefa" >
+                    <input type="text" class="form-control" name="tarefa" id="tarefa" value="<?php echo htmlspecialchars($tarefa); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descrição</label>
-                    <input type="text" class="form-control" name="descricao" id="descricao" >
+                    <input type="text" class="form-control" name="descricao" id="descricao" value="<?php echo htmlspecialchars($descricao); ?>" >
+                </div>
+                <div class="mb-3">
+                    <label for="projeto" class="form-label">Projeto</label>
+                    <input type="text" class="form-control" name="projeto" id="projeto" value="<?php echo htmlspecialchars($projeto); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="data_inicio" class="form-label">Data de Início</label>
-                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" >
+                    <input type="date" class="form-control" name="data_inicio" id="data_inicio" value="<?php echo htmlspecialchars($data_inicio); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="data_fim" class="form-label">Data de Fim</label>
-                    <input type="date" class="form-control" name="data_fim" id="data_fim" >
+                    <input type="date" class="form-control" name="data_fim" id="data_fim" value="<?php echo htmlspecialchars($data_fim); ?>" >
                 </div>
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado</label>
-                    <select class="form-control" name="estado" id="estado" >
-                        <option value="Nao iniciada">Nao iniciada</option>
-                        <option value="Em andamento">Em andamento</option>
-                        <option value="Concluída">Concluída</option>
+                    <select class="form-control" name="estado" id="estado">
+                        <option disabled value="">Selecione o estado</option>
+                        <option value="Nao iniciada" <?php echo ($estado === 'Nao iniciada') ? 'selected' : ''; ?>>Não iniciada</option>
+                        <option value="Em andamento" <?php echo ($estado === 'Em andamento') ? 'selected' : ''; ?>>Em andamento</option>
+                        <option value="Concluída" <?php echo ($estado === 'Concluída') ? 'selected' : ''; ?>>Concluída</option>
                     </select>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -175,41 +216,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-9anC3EepQ3LKW0zQf5L5Ive2f0WmE9zuXFvrDhUto29T95rQD+/ZvsKbF0JDLiXt" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-1Y3PqNigMqN4DKP8SivXQODV5OPoA1pM9Y2OoDq9bsA4DlOi+CIyTE5lMzyfc6+C" crossorigin="anonymous"></script>
 </body>
 </html>
-<script>
-$(document).ready(function() {
-    $('form').submit(function(event) {
-        $('.error-message').remove();
-        let isValid = true;
-
-        if ($('#tarefa').val().trim() === '') {
-            $('#tarefa').after('<div class="error-message text-danger">O campo tarefa é obrigatório.</div>');
-            isValid = false;
-        }
-        if ($('#descricao').val().trim() === '') {
-            $('#descricao').after('<div class="error-message text-danger">O campo descrição é obrigatório.</div>');
-            isValid = false;
-        }
-        if ($('#data_inicio').val() === '') {
-            $('#data_inicio').after('<div class="error-message text-danger">O campo data de início é obrigatório.</div>');
-            isValid = false;
-        }
-        if ($('#data_fim').val() === '') {
-            $('#data_fim').after('<div class="error-message text-danger">O campo data de fim é obrigatório.</div>');
-            isValid = false;
-        }
-        
-        if ($('#estado').val() === '') {
-            $('#estado').after('<div class="error-message text-danger">O campo estado é obrigatório.</div>');
-            isValid = false;
-        }
-
-        if (!isValid) {
-            event.preventDefault();
-        }
-    });
-});
-</script>

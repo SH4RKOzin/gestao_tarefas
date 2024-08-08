@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = $_POST['user'];
     $pass = $_POST['pass'];
 
-    // Prepare the SQL statement to update the password
     $sql = "UPDATE usuarios SET pass = ? WHERE user = ?";
     $stmt = $conn->prepare($sql);
 
@@ -19,10 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $success = $stmt->execute();
 
     if ($success) {
-        // You might want to check if any rows were affected to confirm a successful update
         if ($stmt->affected_rows > 0) {
-            // Redirect to login page or another page
-            header('Location: login.php');
+            header('Location: login.html');
             exit;
         } else {
             $erro = "Nenhum usuário encontrado com esse nome!";
@@ -34,8 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->close();
 }
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -78,10 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="password" class="form-control" name="pass" id="pass" required placeholder="Insira a nova senha">
                 </div>
                 <button type="submit" class="btn btn-primary d-block mx-auto">Salvar</button>
+                <p class="text-center"><a href="login.html" class="btn btn-success">Voltar
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+                    <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+                </svg>
+            </a></p>
             </form>
         </div>
     </div>
 </div>
-
 </body>
 </html>

@@ -2,15 +2,13 @@
 session_start();
 include("conexao.php");
 
-// Verifica se o usuário está autenticado
 if (!isset($_SESSION['id'])) {
-    header("Location: login.php");
+    header("Location: login.html");
     exit();
 }
 
 $user_id = $_SESSION['id'];
 
-// Consulta os dados do usuário
 $stmt = $conn->prepare("SELECT user, email, pass, imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -20,20 +18,19 @@ if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
     $user = $row['user'];
     $email = $row['email'];
-    $imagem = $row['imagem']; // Assume que o nome do arquivo da imagem está armazenado no banco de dados
+    $imagem = $row['imagem'];
 } else {
     $_SESSION['error_message'] = "Erro ao carregar informações do perfil.";
     header('Location: index.php');
     exit();
 }
 
-// Atualiza as informações do perfil
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = $_POST['user'];
     $email = $_POST['email'];
     $pass = $_POST['pass'];
 
-    // Atualiza a imagem se foi enviada
     if (isset($_FILES["imagem"]) && $_FILES["imagem"]["error"] === UPLOAD_ERR_OK) {
         $upload_dir = './img/';
         $upload_file = $upload_dir . basename($_FILES["imagem"]["name"]);
@@ -41,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $upload_file)) {
             $imagem = basename($_FILES["imagem"]["name"]);
 
-            // Atualiza a imagem no banco de dados
             $sql = "UPDATE usuarios SET imagem=? WHERE id=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("si", $imagem, $user_id);
@@ -52,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Atualiza os dados do usuário
     if (!empty($pass)) {
         $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
         $sql = "UPDATE usuarios SET user=?, email=?, pass=? WHERE id=?";
@@ -74,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
-// Recarrega os dados atualizados após o POST
 $stmt = $conn->prepare("SELECT user, email, pass, imagem FROM usuarios WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -211,7 +205,7 @@ $imagem = $row['imagem'];
 
                         </div>
 
-<div class="text-center mb-4">
+                <div class="text-center mb-4">
                     <h1 class="mt-3">Perfil de Usuário</h1>
                 </div>
                     </div>
@@ -236,10 +230,6 @@ $imagem = $row['imagem'];
         </div>
     </div>
 </div>
-
-<footer class="footer">
-    <p>© 2024 Denilton Ngale - SH4RKO</p>
-</footer>
 </body>
 </html>
 <script>
